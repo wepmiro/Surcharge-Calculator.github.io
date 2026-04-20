@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRCSL Surcharge Calculator © Eranda</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f5f7;
+      padding: 20px;
+    }
+    .container {
+      max-width: 480px;
+      background: white;
+      margin: auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #004aad;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background-color: #004aad;
+      color: white;
+      border: none;
+      padding: 10px;
+      margin-top: 15px;
+      width: 100%;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #00357d;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 6px;
+      background: #e6f2ff;
+      font-weight: bold;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      font-size: 15px;
+    }
+    .row span:last-child {
+      width: 140px;
+      text-align: right;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>TRCSL Surcharge Calculator</h2>
+
+  <label>License Fee (LKR):</label>
+  <input type="number" id="licenseFee">
+
+  <label>License Expiry Date:</label>
+  <input type="date" id="expiryDate">
+
+  <label>Payment Settlement Date:</label>
+  <input type="date" id="settlementDate">
+
+  <button onclick="calculateSurcharge()">Calculate Surcharge</button>
+
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+function calculateSurcharge() {
+  const fee = parseFloat(document.getElementById("licenseFee").value);
+  const expiryDate = new Date(document.getElementById("expiryDate").value);
+  const settlementDate = new Date(document.getElementById("settlementDate").value);
+  const cutoffDate = new Date("2024-07-17");
+  const resultDiv = document.getElementById("result");
+
+  resultDiv.innerHTML = "";
+
+  // Validation
+  if (isNaN(fee) || isNaN(expiryDate.getTime()) || isNaN(settlementDate.getTime())) {
+    resultDiv.innerHTML = "<span style='color:red;'>Please enter valid inputs.</span>";
+    return;
+  }
+
+  if (settlementDate < expiryDate) {
+    resultDiv.innerHTML = "<span style='color:red;'>Settlement date cannot be before expiry date.</span>";
+    return;
+  }
+
+  let surchargeStartDate;
+  let message = "";
+
+  if (expiryDate < cutoffDate) {
+    if (settlementDate <= cutoffDate) {
+      resultDiv.innerHTML = "No surcharge applicable.";
+      return;
+    } else {
+      surchargeStartDate = cutoffDate;
+      message = "Surcharge from 2024-07-17.";
+    }
+  } else {
+    surchargeStartDate = expiryDate;
+    message = "Surcharge from expiry date.";
+  }
+
+  // Duration
+  let durationMonths =
+    (settlementDate.getFullYear() - surchargeStartDate.getFullYear()) * 12 +
+    (settlementDate.getMonth() - surchargeStartDate.getMonth());
+
+  if (settlementDate.getDate() >= surchargeStartDate.getDate()) {
+    durationMonths += 1;
+  }
+
+  if (durationMonths <= 0) durationMonths = 1;
+
+  // Percentage display
+let percentageText = (durationMonths > 1)
+  ? `10% + (${durationMonths - 1} × 2%)`
+  : `10%`;
+
+// percentage factor (corrected)
+let perfactor = (durationMonths > 1)
+  ? `${10 + ((durationMonths - 1) * 2)}%`
+  : `10%`;
+
+  // Surcharge
+  let surcharge = (durationMonths > 1)
+    ? (fee * 0.10) + (fee * 0.02 * (durationMonths - 1))
+    : fee * 0.10;
+
+  // Other calculations (NO stamp duty)
+  const bp = surcharge * 0.20;
+  const st = surcharge + bp;
+  const vat = st * 0.18;
+  const total = st + vat;
+
+  // Output
+  resultDiv.innerHTML = `
+    ${message}<br><br>
+
+    License Expiry: ${expiryDate.toLocaleDateString()}<br>
+    Payment Settled: ${settlementDate.toLocaleDateString()}<br>
+    Surcharge Start: ${surchargeStartDate.toLocaleDateString()}<br>
+    Duration: ${durationMonths} month(s)<br>
+    Percentage Applied: ${perfactor}<br><br>
+
+    <div class="row"><span><b>Description:</b></span><span><b>Total ( Rs. )</b></span></div>
+    <hr>
+
+    <div class="row"><span>Surcharge:</span><span>${surcharge.toFixed(2)}</span></div>
+    <div class="row"><span>Budget Proposal 2023: 20%:</span><span>${bp.toFixed(2)}</span></div>
+    <div class="row"><span>Sub Total:</span><span>${st.toFixed(2)}</span></div>
+    <div class="row"><span>VAT (18%):</span><span>${vat.toFixed(2)}</span></div>
+
+    <hr>
+    <div class="row"><span><b>Total:</b></span><span><b>${total.toFixed(2)}</b></span></div>
+  `;
+}
+</script>
+
+</body>
+</html>
