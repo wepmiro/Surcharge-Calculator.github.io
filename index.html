@@ -21,17 +21,6 @@
         <button id="calculate">Calculate Total</button>
         <h2 id="result"></h2>
     </div>
-    <script>
-        document.getElementById('calculate').addEventListener('click', function() {
-            const amount = parseFloat(document.getElementById('amount').value);
-            const surcharge = parseFloat(document.getElementById('surcharge').value);
-            if (!isNaN(amount) && !isNaN(surcharge)) {
-                const total = amount + (amount * (surcharge / 100));
-                document.getElementById('result').textContent = `Total Amount: $${total.toFixed(2)}`;
-            } else {
-                document.getElementById('result').textContent = 'Please enter valid numbers!';
-            }
-        });
-    </script>
+   
 </body>
 </html>
