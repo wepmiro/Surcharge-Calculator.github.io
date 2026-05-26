@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Proforma Invoice Calculator</title>
+<style>
+    body {
+        font-family: Arial;
+        max-width: 700px;
+        margin: 30px auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+    }
+    h2 { text-align:center; }
+    label { display:block; margin-top:10px; }
+    input {
+        width:100%;
+        padding:8px;
+        margin-top:5px;
+    }
+    button {
+        margin-top:15px;
+        width:100%;
+        padding:10px;
+        background:#007bff;
+        color:white;
+        border:none;
+        cursor:pointer;
+    }
+    .result {
+        margin-top:20px;
+        background:#f4f4f4;
+        padding:15px;
+        border-radius:8px;
+        line-height:1.6;
+    }
+	.row {
+      display: flex;
+      justify-content: space-between;
+      margin: 6px 0;
+      font-size: 15px;
+    }
+    .row span:last-child {
+      width: 140px;
+      text-align: right;
+    }
+</style>
+</head>
+<body>
+
+<h2>Proforma Invoice Calculator</h2>
+
+<label>Start Date</label>
+<input type="date" id="startDate">
+
+<label>End Date</label>
+<input type="date" id="endDate">
+
+<label>Frequency Charge</label>
+<input type="number" id="frequencyCharge">
+
+<label>Power Charge</label>
+<input type="number" id="powerCharge">
+
+<button onclick="calculate()">Calculate Invoice</button>
+
+<div class="result" id="result"></div>
+
+<script>
+
+// ?? Number formatting function
+function formatNumber(num) {
+    return num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
+function calculate() {
+
+    let start = new Date(document.getElementById("startDate").value);
+    let end = new Date(document.getElementById("endDate").value);
+
+    let freq = parseFloat(document.getElementById("frequencyCharge").value) || 0;
+    let power = parseFloat(document.getElementById("powerCharge").value) || 0;
+
+    if (!start || !end || end < start) {
+        document.getElementById("result").innerHTML = "Invalid dates";
+        return;
+    }
+
+    // ---- MONTH CALCULATION ----
+    let years = end.getFullYear() - start.getFullYear();
+    let months = years * 12 + (end.getMonth() - start.getMonth());
+
+    if (end.getDate() > start.getDate() && (end.getDate() - start.getDate()) >= 15) {
+months += 1; // optional adjustment
+}
+
+    if (months < 0) months = 0;
+
+    // ---- STEP 1: Fee ----
+    let fee = freq + power;
+
+    // ---- STEP 2: Factor ----
+    let factor = (months / 12) * fee;
+
+    // ---- STEP 3: Budget Proposal 20% ----
+    let budget = factor * 0.20;
+
+    // ---- STEP 4: Sub Total ----
+    let subTotal = factor + budget;
+
+    // ---- STEP 5: VAT 18% ----
+    let vat = subTotal * 0.18;
+
+    // ---- STEP 6: Stamp Duty ----
+    let stampDuty = (subTotal < 20000) ? subTotal * 0.10 : 2000;
+
+    // ---- STEP 7: Total ----
+    let total = subTotal + vat + stampDuty;
+
+    document.getElementById("result").innerHTML = `
+        <b>Months:</b> ${months} <br>
+		
+		<div class="row"><span><b>Description:</b></span><span><b>Total ( Rs. )</b></span></div>
+		<hr>
+        <div class="row"><span>Fee:</span><span> ${formatNumber(fee)} </span></div>
+        <div class="row"><span>Factor (${months}/12):</span><span> ${formatNumber(factor)} </span></div>
+        <div class="row"><span>Budget Proposal (20%):</span><span> ${formatNumber(budget)} </span></div>
+        <div class="row"><span>Sub Total:</span><span> ${formatNumber(subTotal)} </span></div>
+        <div class="row"><span>VAT (18%):</span><span> ${formatNumber(vat)} </span></div>
+        <div class="row"><span>Stamp Duty:</span><span> ${formatNumber(stampDuty)} </span></div>
+        <hr>
+        <div class="row"><span><b>Total:</b></span><span><b> ${formatNumber(total)} </b></span></div>
+    `;
+}
+
+</script>
+
+</body>
+</html>
