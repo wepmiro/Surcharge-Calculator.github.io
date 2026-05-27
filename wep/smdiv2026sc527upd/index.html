@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surcharge Calculator © Eranda</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h2>Surcharge Calculator</h2>
+
+    <label>License Fee (LKR):</label>
+    <input type="number" id="licenseFee" min="0" step="0.01">
+
+    <label>License Expiry Date:</label>
+    <input type="date" id="expiryDate">
+
+    <label>Payment Settlement Date:</label>
+    <input type="date" id="settlementDate">
+
+    <!-- Calculate Button -->
+    <button onclick="calculateSurcharge()">
+      Calculate Surcharge
+    </button>
+
+    <!-- Hidden PDF Button -->
+    <button
+      id="pdfBtn"
+      onclick="downloadPDF()"
+      style="display:none;"
+    >
+      Print PDF
+    </button>
+
+    <!-- Result -->
+    <div class="result" id="result"></div>
+
+  </div>
+
+  <!-- jsPDF -->
+  <script src="jspdf.umd.min.js"></script>
+
+  <!-- Your JS -->
+  <script src="wepsc.js"></script>
+
+</body>
+</html>
