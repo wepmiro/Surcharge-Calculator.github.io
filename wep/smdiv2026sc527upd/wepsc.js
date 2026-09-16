@@ -121,7 +121,6 @@ function calculateSurcharge() {
   resultDiv.innerHTML = `
     <p>${message}</p>
 
-    <div class="row"><span>License Expiry:</span><span>${formatDate(expiryDate)}</span></div>
     <div class="row"><span>Payment Settled:</span><span>${formatDate(settlementDate)}</span></div>
     <div class="row"><span>Surcharge Start:</span><span>${formatDate(surchargeStartDate)}</span></div>
     <div class="row"><span>Duration:</span><span>${durationMonths} month(s)</span></div>
@@ -210,7 +209,6 @@ function downloadPDF() {
     doc.setTextColor(60, 60, 60);
 
     doc.text(`License Fee: Rs. ${formatNumber(data.fee)}`, left + 4, y + 14);
-    doc.text(`License Expiry: ${formatDate(data.expiryDate)}`, left + 4, y + 20);
     doc.text(`Payment Settled: ${formatDate(data.settlementDate)}`, left + 4, y + 26);
     doc.text(`Surcharge Start: ${formatDate(data.surchargeStartDate)}`, left + 4, y + 32);
 
